@@ -14,5 +14,12 @@ import java.text.SimpleDateFormat;
 
 public class Main extends JFrame
 {
-        
+    private static final String URL = "jdbc:oracle:thin:@//localhost:1521/orcl";
+    private static final String USUARIO = "system";
+    private static final String CLAVE = "Tapiero123";
+
+    private JTable tabla;
+
+    private DefaultTableModel modelo;   
+
 }
