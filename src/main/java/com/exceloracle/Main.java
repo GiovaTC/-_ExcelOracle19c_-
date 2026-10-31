@@ -90,11 +90,92 @@ public class Main extends JFrame
 
     }
 
-    private void generarExcel() {
-
-    }
-
+    // CONSULTAR REGISTROS DE ORACLE!
     private void consultarOracle() {
 
+        modelo.setRowCount(0);
+        String sql = """
+                SELECT ID, NOMBRE, VALOR, FECHA_REGISTRO FROM REGISTROS_EXCEL ORDER BY ID
+                """;
+
+        try (
+                Connection conexion = conectarOracle();
+                PreparedStatement ps = conexion.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+        ) {
+
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+
+            while (rs.next())
+            {
+                Object[] fila = {
+                        rs.getInt("ID"),
+                        rs.getString("NOMBRE"),
+                        rs.getBigDecimal("VALOR"),
+
+                        formato.format(rs.getDate("FECHA_REGISTRO"))
+                };
+
+                modelo.addRow(fila);
+            }
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Consulta realizada correctamente.\n"
+                            + "Registros: "
+                            + modelo.getRowCount()
+            );
+        } catch (SQLException ex) {
+
+            mostrarError(
+                    "Error al consultar Oracle:\n"
+                            + ex.getMessage()
+            );
+        }
     }
+
+    private Connection conectarOracle() {
+        return null;
+    }
+
+    private void mostrarError(String s) {
+    }
+
+    // GENERAR ARCHIVO EXCEL!
+    private void generarExcel()
+    {
+        if (modelo.getRowCount() == 0)
+        {
+            JOptionPane.showMessageDialog(
+                    this, "PRIMERO CONSULTA los registros de oracle!"
+            );
+
+            return;
+        }
+
+        JFileChooser selector = new JFileChooser();
+        selector.setDialogTitle("GUARDAR archivo excel");
+        selector.setSelectedFile(new File("ReporteOracle19c.xlsx"));
+
+        int resultado = selector.showSaveDialog(this);
+
+        if (resultado != JFileChooser.APPROVE_OPTION)
+        {
+            return;
+        }
+
+        File archivo = selector.getSelectedFile();
+
+        // ASEGURAR extension XLSX.
+        if (!archivo.getName().toLowerCase().endsWith(".xlsx"))
+        {
+            archivo = new File(archivo.getAbsolutePath() + ".xlsx");
+        }
+        /*
+        try (Workbook libro = new XSSFWorkbook())
+        {
+            Sheet hoja = libro.createSheet("REPORTE oracle");
+        }*/
+    }
+
 }
