@@ -336,9 +336,110 @@ public class Main extends JFrame
 
         File archivo = selector.getSelectedFile();
     }
-    
+
     private void cargarExcelEnTabla(File archivo) {
+        try (
+                FileInputStream entrada = new FileInputStream(archivo);
+
+                Workbook libro = WorkbookFactory.create(entrada)
+            ) {
+
+            Sheet hoja = libro.getSheetAt(0);
+            modelo.setRowCount(0);
+            modelo.setColumnCount(0);
+
+            Row encabezado = hoja.getRow(0);
+
+            if (encabezado == null)
+            {
+                throw new Exception("EL archivo excel " + "no tiene encabezado!");
+            }
+
+            // LEER ENCABEZADOS
+            for (
+                    int columna = 0;
+                    columna < encabezado
+                            .getLastCellNum();
+                    columna++
+            ) {
+
+                Cell celda =
+                        encabezado.getCell(
+                                columna
+                        );
+
+                modelo.addColumn(
+                        obtenerValorCelda(
+                                celda
+                        )
+                );
+            }
+
+            // LEER FILAS
+            for (
+                    int fila = 1;
+                    fila <= hoja.getLastRowNum();
+                    fila++
+            ) {
+
+                Row filaExcel =
+                        hoja.getRow(fila);
+
+                if (filaExcel == null) {
+
+                    continue;
+                }
+
+                Object[] datos =
+                        new Object[
+                                modelo.getColumnCount()
+                                ];
+
+                for (
+                        int columna = 0;
+                        columna < modelo
+                                .getColumnCount();
+                        columna++
+                ) {
+
+                    datos[columna] =
+                            obtenerValorCelda(
+                                    filaExcel.getCell(
+                                            columna
+                                    )
+                            );
+                }
+
+                modelo.addRow(datos);
+            }
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Archivo Excel cargado "
+                            + "en la interfaz."
+            );
+
+        } catch (Exception ex) {
+
+            mostrarError(
+                    "Error al abrir Excel:\n"
+                            + ex.getMessage()
+            );
+        }
     }
+
+    private Object obtenerValorCelda(Cell celda)
+    {
+        if (celda == null)
+        {
+            return "";
+        }
+
+        DataFormatter formato = new DataFormatter();
+
+        return formato.formatCellValue(celda);
+    }
+
 
     private void limpiarTabla() {
     }
