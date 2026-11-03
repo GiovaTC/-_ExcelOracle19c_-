@@ -87,7 +87,7 @@ public class Main extends JFrame
 
         return DriverManager.getConnection(
                 URL, USUARIO, CLAVE
-        );  
+        );
     }
 
     // CONSULTAR REGISTROS DE ORACLE!
@@ -134,6 +134,197 @@ public class Main extends JFrame
         }
     }
 
+    // GENERAR ARCHIVO EXCEL!
+    private void generarExcel()
+    {
+        if (modelo.getRowCount() == 0) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Primero consulta los registros de Oracle."
+            );
+
+            return;
+        }
+
+        JFileChooser selector =
+                new JFileChooser();
+
+        selector.setDialogTitle(
+                "Guardar archivo Excel"
+        );
+
+        selector.setSelectedFile(
+                new File("ReporteOracle19c.xlsx")
+        );
+
+        int resultado =
+                selector.showSaveDialog(this);
+
+        if (resultado !=
+                JFileChooser.APPROVE_OPTION) {
+
+            return;
+        }
+
+        File archivo =
+                selector.getSelectedFile();
+
+        // Asegurar extensión XLSX
+        if (!archivo.getName()
+                .toLowerCase()
+                .endsWith(".xlsx")) {
+
+            archivo = new File(
+                    archivo.getAbsolutePath()
+                            + ".xlsx"
+            );
+        }
+
+        try (Workbook libro =
+                     new XSSFWorkbook()) {
+
+            Sheet hoja =
+                    libro.createSheet(
+                            "Reporte Oracle"
+                    );
+
+            // ESTILO DEL ENCABEZADO
+            CellStyle estiloEncabezado =
+                    libro.createCellStyle();
+
+            org.apache.poi.ss.usermodel.Font fuente =
+                    libro.createFont();
+
+            fuente.setBold(true);
+
+            fuente.setColor(
+                    IndexedColors.WHITE.getIndex()
+            );
+
+            estiloEncabezado.setFont(fuente);
+
+            estiloEncabezado
+                    .setFillForegroundColor(
+                            IndexedColors.DARK_BLUE
+                                    .getIndex()
+                    );
+
+            estiloEncabezado
+                    .setFillPattern(
+                            FillPatternType
+                                    .SOLID_FOREGROUND
+                    );
+
+            // CREAR ENCABEZADOS
+            Row encabezado =
+                    hoja.createRow(0);
+
+            for (
+                    int columna = 0;
+                    columna < modelo.getColumnCount();
+                    columna++
+            ) {
+
+                Cell celda =
+                        encabezado.createCell(
+                                columna
+                        );
+
+                celda.setCellValue(
+                        modelo.getColumnName(
+                                columna
+                        )
+                );
+
+                celda.setCellStyle(
+                        estiloEncabezado
+                );
+            }
+
+            // CREAR FILAS
+            for (
+                    int fila = 0;
+                    fila < modelo.getRowCount();
+                    fila++
+            ) {
+
+                Row filaExcel =
+                        hoja.createRow(
+                                fila + 1
+                        );
+
+                for (
+                        int columna = 0;
+                        columna < modelo.getColumnCount();
+                        columna++
+                ) {
+
+                    Cell celda =
+                            filaExcel.createCell(
+                                    columna
+                            );
+
+                    Object valor =
+                            modelo.getValueAt(
+                                    fila,
+                                    columna
+                            );
+
+                    celda.setCellValue(
+                            valor == null
+                                    ? ""
+                                    : valor.toString()
+                    );
+                }
+            }
+
+            // AJUSTAR ANCHO DE COLUMNAS
+            for (
+                    int columna = 0;
+                    columna < modelo.getColumnCount();
+                    columna++
+            ) {
+
+                hoja.autoSizeColumn(
+                        columna
+                );
+            }
+
+            // GUARDAR ARCHIVO
+            try (
+                    FileOutputStream salida =
+                            new FileOutputStream(
+                                    archivo
+                            )
+            ) {
+
+                libro.write(salida);
+            }
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Archivo Excel generado correctamente:\n"
+                            + archivo.getAbsolutePath()
+            );
+
+            // VISUALIZAR EL ARCHIVO
+            cargarExcelEnTabla(
+                    archivo
+            );
+
+        } catch (Exception ex) {
+
+            mostrarError(
+                    "Error al generar Excel:\n"
+                            + ex.getMessage()
+            );
+        }
+    }   
+
+    private void cargarExcelEnTabla(File archivo) {
+    }
+
     private void limpiarTabla() {
     }
 
@@ -142,43 +333,6 @@ public class Main extends JFrame
     }
 
     private void mostrarError(String s) {
-    }
-
-    // GENERAR ARCHIVO EXCEL!
-    private void generarExcel()
-    {
-        if (modelo.getRowCount() == 0)
-        {
-            JOptionPane.showMessageDialog(
-                    this, "PRIMERO CONSULTA los registros de oracle!"
-            );
-
-            return;
-        }
-
-        JFileChooser selector = new JFileChooser();
-        selector.setDialogTitle("GUARDAR archivo excel");
-        selector.setSelectedFile(new File("ReporteOracle19c.xlsx"));
-
-        int resultado = selector.showSaveDialog(this);
-
-        if (resultado != JFileChooser.APPROVE_OPTION)
-        {
-            return;
-        }
-
-        File archivo = selector.getSelectedFile();
-
-        // ASEGURAR extension XLSX.
-        if (!archivo.getName().toLowerCase().endsWith(".xlsx"))
-        {
-            archivo = new File(archivo.getAbsolutePath() + ".xlsx");
-        }
-        /*
-        try (Workbook libro = new XSSFWorkbook())
-        {
-            Sheet hoja = libro.createSheet("REPORTE oracle");
-        }*/
     }
 
 }
