@@ -320,16 +320,27 @@ public class Main extends JFrame
                             + ex.getMessage()
             );
         }
-    }   
-
-    private void cargarExcelEnTabla(File archivo) {
-    }
-
-    private void limpiarTabla() {
     }
 
     private void abrirExcel() {
 
+        JFileChooser selector = new JFileChooser();
+
+        selector.setDialogTitle("SELECCIONAR archivo excel!");
+
+        int resultado = selector.showOpenDialog(this);
+
+        if ( resultado != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File archivo = selector.getSelectedFile();
+    }
+    
+    private void cargarExcelEnTabla(File archivo) {
+    }
+
+    private void limpiarTabla() {
     }
 
     private void mostrarError(String s) {
