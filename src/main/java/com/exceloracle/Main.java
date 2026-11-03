@@ -83,11 +83,11 @@ public class Main extends JFrame
         btnLimpiar.addActionListener(e -> limpiarTabla());
     }
 
-    private void limpiarTabla() {
-    }
+    private Connection conectarOracle() throws SQLException {
 
-    private void abrirExcel() {
-
+        return DriverManager.getConnection(
+                URL, USUARIO, CLAVE
+        );  
     }
 
     // CONSULTAR REGISTROS DE ORACLE!
@@ -134,8 +134,11 @@ public class Main extends JFrame
         }
     }
 
-    private Connection conectarOracle() {
-        return null;
+    private void limpiarTabla() {
+    }
+
+    private void abrirExcel() {
+
     }
 
     private void mostrarError(String s) {
