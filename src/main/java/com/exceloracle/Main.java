@@ -451,6 +451,21 @@ public class Main extends JFrame
     {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE
         );
-    }   
+    }
 
+    // INICIO DEL programa.
+    public static void main(String[] args)
+    {
+        SwingUtilities.invokeLater(
+                () -> {
+
+                    Main ventana =
+                            new Main();
+
+                    ventana.setVisible(
+                            true
+                    );
+                }
+        );
+    }   
 }
