@@ -441,10 +441,16 @@ public class Main extends JFrame
     }
 
 
-    private void limpiarTabla() {
+    private void limpiarTabla()
+    {
+
+        modelo.setRowCount(0);
     }
 
-    private void mostrarError(String s) {
-    }
+    private void mostrarError(String mensaje)
+    {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE
+        );
+    }   
 
 }
